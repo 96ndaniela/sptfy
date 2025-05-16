@@ -36,7 +36,7 @@ unknown user for you to show the pipeline created to generate a new recommendati
 sptfy
 ── data/                  # all data
 ── src/                   # py models
-── visual        /        # app visual
+── visual/                # app visual
 ── main.py                # rec system
 ── requirements.txt       # packages
 ── Dockerfile             # config
@@ -48,8 +48,18 @@ sptfy
 ── prepare dockerfile
 ── run docker  / build
 ── choose app for visual
-── decide on features ( decide between energy & tempo )
+── decide on features ( decided on tempo, might use ranking for top 10 that aren't already in their playlist )
 ── cry
 ── check all libraries needed
 ── test
+── visualization: will need to be tempo of the playlist itself + popularity chart of the recommendations
+```
+
+### logic
+```
+── user input should be from 4 users (.csv)
+── must find existing playlist in dataset & another that matches an average tempo for it
+── neds to rank them in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
+── should return top 10 tracks: keypoint being, not in the list, fulfilling 3.a
+── needs to have tempo similarity for user's current preferences + popularity score of the songs (rank new suggestions)
 ```
