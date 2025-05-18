@@ -25,3 +25,8 @@ def match_usersongs(sptfy_df, uplay_datafr): # find track name, artists, get spt
     cols = sptfy_df.columns.tolist()
     return merged[cols]
 
+# closest playlist def
+
+
+# custom playlist def
+
