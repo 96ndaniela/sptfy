@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from src.tempo import ( 
+load_sptfy,
+match_usersongs,
 )
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
