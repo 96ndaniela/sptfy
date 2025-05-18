@@ -6,6 +6,7 @@ import seaborn as sns
 from src/tempo import ( 
 load_sptfy,
 match_usersongs,
+closest_playlist,
 )
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
