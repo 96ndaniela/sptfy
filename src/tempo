@@ -5,7 +5,8 @@ def load_sptfy(filepath, playlist_with=10):  # loading, cleaning, grouping
     df = pd.read_csv(filepath)
     df = df.drop_duplicates(subset=['name', 'artists'])
     df = df.dropna(subset=['tempo', 'popularity'])
- 
+    df = df.reset_index(drop=True) 
+
     if 'playlist_new' not in df.columns:
         n = len(df)
         playlist_new = []
