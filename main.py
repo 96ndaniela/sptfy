@@ -1,19 +1,16 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src/tempo import ( 
-load_sptfy,
-match_usersongs,
-closest_playlist,
-)
+
+from src.tempo.utils import load_sptfy, match_usersongs
+from src.tempo.recommender import recommend_playlists_for_user
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
 
 @st.cache_data
 def load_data():
-    spotify_df = load_spotify_data("data/spotify_songs.csv")
+    spotify_df = load_sptfy("data/spotify_songs.csv", playlist_with=10)
     user_files = {
         "User A": "data/User_A.csv",
         "User B": "data/User_B.csv",
@@ -22,24 +19,63 @@ def load_data():
     }
     return spotify_df, user_files
 
-def main():
-    st.title("spotify: song recommendations (based on tempo & ranking")
-    sptfy_df, user_files = load_data()
+def plot_tempo_distribution(df, title):
+    fig, ax = plt.subplots(figsize=(8, 4))
+    sns.histplot(df["tempo"], kde=True, ax=ax, color='skyblue')
+    ax.set_title(title)
+    ax.set_xlabel("tempo")
+    ax.set_ylabel("frequency")
+    st.pyplot(fig)
 
-    st.sidebar.header("select user, or upload a new csv")
-    user_choice = st.sidebar.selectbox("choose an user playlist:", list(user_files.keys()) + ["upload new"])
+def plot_popularity_bar(df, title):
+    top_songs = df.sort_values(by="popularity", ascending=False).head(10)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    sns.barplot(x="popularity", y="name", data=top_songs, ax=ax, palette="viridis")
+    ax.set_title(title)
+    st.pyplot(fig)
+
+def main():
+    st.title("spotify recommendations based on tempo & popularity")
+
+    sptfy_df, user_files = load_data()
+    st.sidebar.header("choose or upload a playlist")
+    user_choice = st.sidebar.selectbox("Select user:", list(user_files.keys()) + ["upload new"])
 
     if user_choice == "upload new":
-        uploaded_file = st.sidebar.file_uploader("upload your playlist in csv form", type=["csv"])
+        uploaded_file = st.sidebar.file_uploader("upload your playlist in csv format", type=["csv"])
         if uploaded_file is not None:
             user_df = pd.read_csv(uploaded_file)
-            user_name = "new user uploaded!"
+            user_name = "new uploaded user"
         else:
-            st.info("please upload a new csv.")
+            st.info("please upload a new csv file to continue.")
             st.stop()
     else:
         user_name = user_choice
         user_df = pd.read_csv(user_files[user_choice])
+
+    st.subheader(f"original playlist for {user_name}")
+    st.dataframe(user_df.head(10))
+
+    matched_user_df = match_usersongs(sptfy_df, user_df)
+    if matched_user_df.empty:
+        st.warning("no matching songs found in the spotify dataset.")
+        st.stop()
+
+    existing_playlist, generated_playlist = recommend_playlists_for_user(matched_user_df, sptfy_df)
+
+    st.subheader("tempo distribution of your playlist")
+    plot_tempo_distribution(matched_user_df, "your playlist tempo distribution")
+
+    st.subheader("top songs by popularity")
+    plot_popularity_bar(matched_user_df, "most popular songs")
+
+    st.subheader("recommendation from existing playlist")
+    st.dataframe(existing_playlist[["name", "artists", "playlist_name", "tempo", "popularity"]])
+
+    st.subheader("new playlist created for you")
+    st.dataframe(generated_playlist[["name", "artists", "tempo", "popularity"]])
+
+    st.success("these recommendations were generated using tempo similarity + popularity filtering.")
 
 if __name__ == "__main__":
     main()
