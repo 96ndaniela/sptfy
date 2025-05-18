@@ -19,3 +19,9 @@ def load_sptfy(filepath, playlist_with=10):  # loading, cleaning, grouping
 
 
 def match_usersongs(sptfy_df, uplay_datafr): # find track name, artists, get sptfy dataframe 
+    merged = pd.merge(uplay_datafr, sptfy_df, on=['name', 'artists'], how='inner', suffixes=('_user', '_spotify'))
+    if merged.empty:
+        merged = pd.merge(uplay_datafr, sptfy_df, on=['name'], how='inner', suffixes=('_user', '_spotify'))
+    cols = sptfy_df.columns.tolist()
+    return merged[cols]
+
