@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src.tempo import ( 
+from src/tempo import ( 
 load_sptfy,
 match_usersongs,
 )
