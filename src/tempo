@@ -26,7 +26,22 @@ def match_usersongs(sptfy_df, uplay_datafr): # find track name, artists, get spt
     return merged[cols]
 
 # closest playlist def
+def closest_playlist(sptfy_df, utracks_df):
+    user_avg_tempo = utracks_df['tempo'].mean()
+    grouped = sptfy_df.groupby('playlist_name')
 
+    min_diff = float('inf')
+    closest_playlist = None
+
+    for playlist_name, group in grouped:
+        avg_tempo = group['tempo'].mean()
+        diff = abs(avg_tempo - user_avg_tempo)
+        if diff < min_diff:
+            min_diff = diff
+            closest_playlist = playlist_name
+
+    closest_playlist = sptfy_df[sptfy_df['playlist_name'] == closest_playlist]
+    return closest_playlistn.reset_index(drop=True), closest_playlist
 
 # custom playlist def
 
