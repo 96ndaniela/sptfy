@@ -1,47 +1,68 @@
 import pandas as pd
 import numpy as np
 
-def load_sptfy(filepath, playlist_with=10):  # loading, cleaning, grouping
+# load dataset, group into playlists
+
+def load_sptfy(filepath, playlist_with=10):
     df = pd.read_csv(filepath)
     df = df.drop_duplicates(subset=['name', 'artists'])
     df = df.dropna(subset=['tempo', 'popularity'])
-    df = df.reset_index(drop=True) 
+    df = df.reset_index(drop=True)
 
-    if 'playlist_new' not in df.columns:
-        n = len(df)
-        playlist_new = []
-        for i in range(n):
+    if 'playlist_name' not in df.columns:
+        playlist_names = []
+        for i in range(len(df)):
             playlist_num = (i // playlist_with) + 1
-            playlist_new.append(f"playlist_{playlist_num}")
-        df['playlist_new'] = playlist_new
+            playlist_names.append(f"playlist_{playlist_num}")
+        df['playlist_name'] = playlist_names
 
     return df
 
+# match user playlist songs with spotify dataset
 
-def match_usersongs(sptfy_df, uplay_datafr): # find track name, artists, get sptfy dataframe 
+def match_usersongs(sptfy_df, uplay_datafr):
     merged = pd.merge(uplay_datafr, sptfy_df, on=['name', 'artists'], how='inner', suffixes=('_user', '_spotify'))
     if merged.empty:
         merged = pd.merge(uplay_datafr, sptfy_df, on=['name'], how='inner', suffixes=('_user', '_spotify'))
     cols = sptfy_df.columns.tolist()
     return merged[cols]
 
-# closest playlist def
+# find the closest existing playlist based on average tempo
+
 def closest_playlist(sptfy_df, utracks_df):
     user_avg_tempo = utracks_df['tempo'].mean()
     grouped = sptfy_df.groupby('playlist_name')
 
     min_diff = float('inf')
-    closest_playlist = None
+    closest = None
 
     for playlist_name, group in grouped:
         avg_tempo = group['tempo'].mean()
         diff = abs(avg_tempo - user_avg_tempo)
         if diff < min_diff:
             min_diff = diff
-            closest_playlist = playlist_name
+            closest = playlist_name
 
-    closest_playlist = sptfy_df[sptfy_df['playlist_name'] == closest_playlist]
-    return closest_playlistn.reset_index(drop=True), closest_playlist
+    closest_df = sptfy_df[sptfy_df['playlist_name'] == closest]
+    return closest_df.reset_index(drop=True), closest
 
-# custom playlist def
+# new playlist based on user's tempo and popularity
 
+def generate_custom_playlist(sptfy_df, user_tracks_df, exclude_tracks=None, playlist_size=10):
+    if exclude_tracks is None:
+        exclude_tracks = []
+
+    user_avg_tempo = user_tracks_df['tempo'].mean()
+    tempo_lower = user_avg_tempo - 15
+    tempo_upper = user_avg_tempo + 15
+
+    filtered = sptfy_df[
+        (sptfy_df['tempo'] >= tempo_lower) &
+        (sptfy_df['tempo'] <= tempo_upper) &
+        (~sptfy_df['name'].isin(exclude_tracks))
+    ]
+
+    filtered = filtered.sort_values(by='popularity', ascending=False)
+    new_playlist = filtered.head(playlist_size).reset_index(drop=True)
+
+    return new_playlist
