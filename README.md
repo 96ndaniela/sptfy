@@ -44,12 +44,9 @@ sptfy
 
 ### to do 
 ```
-── run local
-── prepare dockerfile
-── run docker  / build
-── choose app for visual
+── run local 
+── run docker  / build 
 ── decide on features ( decided on tempo, might use ranking for top 10 that aren't already in their playlist )
-── cry
 ── check all libraries needed
 ── test
 ── visualization: will need to be tempo of the playlist itself + popularity chart of the recommendations
