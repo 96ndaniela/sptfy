@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from tempo import load_sptfy, match_usersongs, generate_custom_playlist
+from tempo import load_sptfy, enrich_user_playlist, match_usersongs, generate_custom_playlist
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
 
@@ -43,23 +43,23 @@ def main():
     if user_choice == "upload new":
         uploaded_file = st.sidebar.file_uploader("upload your playlist in csv format", type=["csv"])
         if uploaded_file is not None:
-            user_df = pd.read_csv(uploaded_file)
+            raw_user_df = pd.read_csv(uploaded_file)
             user_name = "new uploaded user"
         else:
             st.info("please upload a new csv file to continue.")
             st.stop()
     else:
         user_name = user_choice
-        user_df = pd.read_csv(user_files[user_choice])
+        raw_user_df = pd.read_csv(user_files[user_choice])
 
-    st.subheader(f"original playlist for {user_name}")
-    st.dataframe(user_df.head(10))
+    user_df = enrich_user_playlist(raw_user_df, sptfy_df)
 
-    try:
-        closest_df = match_usersongs(sptfy_df, user_df)
-    except Exception as e:
-        st.error(f"Error processing playlist: {e}")
+    if user_df.empty:
+        st.warning("no matching songs found in spotify dataset.")
         st.stop()
+
+    st.subheader(f"original playlist for {user_name} (enriched)")
+    st.dataframe(user_df.head(10))
 
     st.subheader("tempo distribution of your playlist")
     plot_tempo_distribution(user_df, "your playlist tempo distribution")
@@ -67,6 +67,7 @@ def main():
     st.subheader("top songs by popularity")
     plot_popularity_bar(user_df, "most popular songs")
 
+    closest_df = match_usersongs(sptfy_df, user_df)
     st.subheader("recommendation from existing playlist")
     st.dataframe(closest_df[["name", "artists", "playlist_name", "tempo", "popularity"]])
 
