@@ -1,6 +1,7 @@
 # sptfy
 
 **“Generate Spotify Recommendations”**
+
 You will be evaluated on all the following characteristics: clarity/communication, creativity,
 data management, exploratory data analysis, modeling and business value. You have to use
 Python to process the dataset and to generate the solution, but you are free to choose any
@@ -12,7 +13,7 @@ your analysis.
 The solution has to be uploaded to a Github repository and provide access for our team
 members.
 
-**context**
+**Context**
 Assume you have to present your results to a Data Science Team and also a Marketing Team and
 their manager.
 In general, musical tastes often differ quite drastically from what is popular in the mainstream to
@@ -34,10 +35,9 @@ unknown user for you to show the pipeline created to generate a new recommendati
 
 ```
 sptfy
-── data/                  # all data
-── src/                   # py models
-── visual/                # app visual
-── main.py                # rec system
+── data/                  # all data ( csvs, dataset to work with )  
+── main.py                # recommendation system
+── tempo.py               # recommendation functions based on tempo + ranking
 ── requirements.txt       # packages
 ── Dockerfile             # config
 ```
@@ -45,18 +45,16 @@ sptfy
 ### to do 
 ```
 ── run local 
-── run docker  / build 
-── decide on features ( decided on tempo, might use ranking for top 10 that aren't already in their playlist )
-── check all libraries needed
-── test
-── visualization: will need to be tempo of the playlist itself + popularity chart of the recommendations
+── make visual prettier bro, sike
+── test again with a dummy csv
+── cry more
 ```
 
 ### logic
 ```
-── user input should be from 4 users (.csv)
-── must find existing playlist in dataset & another that matches an average tempo for it
-── neds to rank them in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
+── user input should be from 4 users (.csv) or a new file that has at least: id, song's name & artist
+── must find existing playlist in dataset ( playlist_name ) & another that matches the average tempo for all songs
+── shows possible song recommendations based in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
 ── should return top 10 tracks: keypoint being, not in the list, fulfilling 3.a
-── needs to have tempo similarity for user's current preferences + popularity score of the songs (rank new suggestions)
+── needs to have tempo similarity for user's current preferences + popularity score of the songs ( rank new suggestions )
 ```
