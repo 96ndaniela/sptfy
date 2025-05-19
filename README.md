@@ -63,10 +63,12 @@ s t r e a m l i t & d o c k e r
      docker build -t spotifyrecs .
      docker run -p 8501:8501 spotifyrecs
 ── visit : http://localhost:8501 in your browser to access the app.
-
-
-
-
 ```
 
+### documentation
+```
+── streamlit + python : https://www.datacamp.com/tutorial/streamlit & https://docs.streamlit.io/develop/api-reference
+── streamlit + docker : https://docs.streamlit.io/deploy/tutorials/docker
+── streamlit + visuals / better performance : 
+```
  
