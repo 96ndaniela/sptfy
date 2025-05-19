@@ -31,7 +31,7 @@ def load_sptfy(filepath, playlist_with=10):
 
     return df
 
-def match_usersongs(sptfy_df, uplay_datafr):
+#def match_usersongs(sptfy_df, uplay_datafr):
     # rename columns in user dataframe if needed
     rename_map = {}
     if 'track_name' in uplay_datafr.columns and 'name' not in uplay_datafr.columns:
