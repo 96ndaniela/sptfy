@@ -31,6 +31,16 @@ use this scoring to create recommendations?
 Note. When presenting your solution you will be given a new playlist corresponding to an
 unknown user for you to show the pipeline created to generate a new recommendation.
 
+
+### logic
+```
+── user input should be from 4 users (.csv) or a new file that has at least: id, song's name & artist
+── must find existing playlist in dataset ( playlist_name ) & another that matches the average tempo for all songs
+── shows possible song recommendations based in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
+── should return top 10 tracks: keypoint being, not in the list, fulfilling 3.a
+── needs to have tempo similarity for user's current preferences + popularity score of the songs ( rank new suggestions )
+```
+
 ## structure
 
 ```
@@ -44,11 +54,12 @@ s t r e a m l i t & d o c k e r
 ```
  
 
-### logic
+### visualization
 ```
-── user input should be from 4 users (.csv) or a new file that has at least: id, song's name & artist
-── must find existing playlist in dataset ( playlist_name ) & another that matches the average tempo for all songs
-── shows possible song recommendations based in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
-── should return top 10 tracks: keypoint being, not in the list, fulfilling 3.a
-── needs to have tempo similarity for user's current preferences + popularity score of the songs ( rank new suggestions )
+── currently public, available to see & work with on : https://spotifyrecs.streamlit.app/
+── works with docker ( +++ )
+──  
+──   
 ```
+
+ 
