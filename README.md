@@ -41,7 +41,6 @@ s t r e a m l i t & d o c k e r
 ── tempo.py               # recommendation functions based on tempo + ranking
 ── requirements.txt       # packages
 ── Dockerfile             # config
-── dmain.py               # please use this one as pipeline entry for either docker or cli use ! 
 ```
  
 
