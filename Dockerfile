@@ -11,11 +11,14 @@ COPY requirements.txt .
 # libraries + depend
 RUN apt-get update && apt-get install -y \
     build-essential \
-    && pip install --no-cache-dir -r requirements.txt \
-    && apt-get clean
-# project - > container
+    && rm -rf /var/lib/apt/lists/* 
+    
+# project 
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 COPY . .
 
 # for streamlit
 EXPOSE 8501 
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "main.py", "--server.port=8501", "--server.enableCORS=false"]
