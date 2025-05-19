@@ -60,8 +60,8 @@ s t r e a m l i t & d o c k e r
 ── works with docker ( +++ )
      git clone https://github.com/96ndaniela/sptfy.git
      cd sptfy
-     docker build -t spotifyrecs .
-     docker run -p 8501:8501 spotifyrecs
+     docker build -t sptfy .
+     docker run -p 8501:8501 sptfy
 ── visit : http://localhost:8501 in your browser to access the app.
 ```
 
@@ -69,6 +69,6 @@ s t r e a m l i t & d o c k e r
 ```
 ── streamlit + python : https://www.datacamp.com/tutorial/streamlit & https://docs.streamlit.io/develop/api-reference
 ── streamlit + docker : https://docs.streamlit.io/deploy/tutorials/docker
-── streamlit + visuals / better performance : 
+── streamlit + visuals / better performance : https://docs.streamlit.io/develop/api-reference/media/st.image
 ```
  
