@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from tempo import load_sptfy, match_usersongs, closest_playlist, generate_custom_playlist
+from tempo import load_sptfy, match_usersongs, generate_custom_playlist
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
 
@@ -22,8 +22,8 @@ def plot_tempo_distribution(df, title):
     fig, ax = plt.subplots(figsize=(8, 4))
     sns.histplot(df["tempo"], kde=True, ax=ax, color='skyblue')
     ax.set_title(title)
-    ax.set_xlabel("Tempo")
-    ax.set_ylabel("Frequency")
+    ax.set_xlabel("tempo")
+    ax.set_ylabel("frequency")
     st.pyplot(fig)
 
 def plot_popularity_bar(df, title):
@@ -37,7 +37,6 @@ def main():
     st.title("spotify recommendations based on tempo & popularity")
 
     sptfy_df, user_files = load_data()
-
     st.sidebar.header("choose or upload a playlist")
     user_choice = st.sidebar.selectbox("select user:", list(user_files.keys()) + ["upload new"])
 
@@ -53,27 +52,29 @@ def main():
         user_name = user_choice
         user_df = pd.read_csv(user_files[user_choice])
 
-    st.subheader(f"Original playlist for {user_name}")
+    st.subheader(f"original playlist for {user_name}")
     st.dataframe(user_df.head(10))
- 
 
-    # closest existing playlist and new generated playlist
-    existing_playlist_df, _ = closest_playlist(sptfy_df, matched_user_df)
-    generated_playlist_df = generate_custom_playlist(sptfy_df, matched_user_df)
+    try:
+        closest_df = match_usersongs(sptfy_df, user_df)
+    except Exception as e:
+        st.error(f"Error processing playlist: {e}")
+        st.stop()
 
     st.subheader("tempo distribution of your playlist")
-    plot_tempo_distribution(matched_user_df, "your playlist tempo distribution")
+    plot_tempo_distribution(user_df, "your playlist tempo distribution")
 
     st.subheader("top songs by popularity")
-    plot_popularity_bar(matched_user_df, "most popular songs")
+    plot_popularity_bar(user_df, "most popular songs")
 
-    st.subheader("recommendation: closest existing playlist")
-    st.dataframe(existing_playlist_df[["name", "artists", "playlist_name", "tempo", "popularity"]])
+    st.subheader("recommendation from existing playlist")
+    st.dataframe(closest_df[["name", "artists", "playlist_name", "tempo", "popularity"]])
 
-    st.subheader("Recommendation: new custom playlist created for you")
-    st.dataframe(generated_playlist_df[["name", "artists", "tempo", "popularity"]])
+    generated_df = generate_custom_playlist(sptfy_df, user_df, exclude_tracks=user_df["name"].tolist())
+    st.subheader("new playlist created for you")
+    st.dataframe(generated_df[["name", "artists", "tempo", "popularity"]])
 
-    st.success("recommendations generated using tempo similarity and popularity filtering.")
+    st.success("these recommendations were generated using tempo similarity + popularity filtering.")
 
 if __name__ == "__main__":
     main()
