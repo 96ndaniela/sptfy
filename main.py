@@ -5,19 +5,18 @@ import seaborn as sns
 
 from tempo import load_sptfy, enrich_user_playlist, closest_playlist, generate_custom_playlist
 
-
 st.set_page_config(page_title="test", layout="wide")
 
 @st.cache_data
 def load_data():
-    spotify_df = load_sptfy("data/spotify_songs.csv", playlist_with=10)
+    sptfy_df = load_sptfy("data/spotify_songs.csv")
     user_files = {
         "User A": "data/User_A.csv",
         "User B": "data/User_B.csv",
         "User J": "data/User_J.csv",
         "User O": "data/User_O.csv",
     }
-    return spotify_df, user_files
+    return sptfy_df, user_files
 
 def plot_tempo_distribution(df, title):
     fig, ax = plt.subplots(figsize=(8, 4))
@@ -35,23 +34,22 @@ def plot_popularity_bar(df, title):
     st.pyplot(fig)
 
 def main():
-    st.title("spotify recommendations based on tempo & popularity")
+    st.title("test")
 
     sptfy_df, user_files = load_data()
-    st.sidebar.header("choose a playlist")
-    user_choice = st.sidebar.selectbox("select user:", list(user_files.keys()) + ["upload new"])
+    st.sidebar.header("Choose or Upload a Playlist")
+    user_choice = st.sidebar.selectbox("Select User:", list(user_files.keys()) + ["upload new"])
 
     if user_choice == "upload new":
-        uploaded_file = st.sidebar.file_uploader("new playlist in csv format", type=["csv"])
-        if uploaded_file is not None:
-            raw_user_df = pd.read_csv(uploaded_file)
-            user_name = "new user has been uploaded"
-        else:
-            st.info("please upload a new csv file to continue.")
+        uploaded_file = st.sidebar.file_uploader("uploada csv", type=["csv"])
+        if uploaded_file is None:
+            st.warning("Please upload a file.")
             st.stop()
+        raw_user_df = pd.read_csv(uploaded_file)
+        user_name = "uploaded user"
     else:
-        user_name = user_choice
         raw_user_df = pd.read_csv(user_files[user_choice])
+        user_name = user_choice
 
     try:
         user_df = enrich_user_playlist(raw_user_df, sptfy_df)
@@ -60,28 +58,26 @@ def main():
         st.stop()
 
     if user_df.empty:
-        st.warning("no matching songs found in spotify dataset for your playlist.")
-        st.stop()
+        st.warning("no matching songs found in the spotify dataset.") 
 
     st.subheader(f"original playlist for {user_name}")
-    st.dataframe(user_df[["name", "artists", "tempo", "popularity"]].head(10))
+    st.dataframe(user_df[['name', 'artists', 'tempo', 'popularity']])
 
-    st.subheader("yempo distribution of your playlist")
-    plot_tempo_distribution(user_df, "your playlist has this tempo:")
+    st.subheader("tempo")
+    plot_tempo_distribution(user_df, "your playlist tempo distribution")
 
-    st.subheader("top songs by popularity")
-    plot_popularity_bar(user_df, "most popular songs in your playlist")
+    st.subheader("top songs")
+    plot_popularity_bar(user_df, "Most Popular Songs")
 
-    existing_playlist = closest_playlist(sptfy_df, user_df)
-    st.subheader("recommendations from existing playlist")
-    st.dataframe(existing_playlist[["name", "artists", "playlist_name", "tempo", "popularity"]])
+    existing_playlist_df = closest_playlist(sptfy_df, user_df)
+    st.subheader("closest ")
+    st.dataframe(existing_playlist_df[['name', 'artists', 'playlist_name', 'tempo', 'popularity']].head(10))
 
-    exclude_tracks = user_df['name'].tolist()
-    generated_playlist = generate_custom_playlist(sptfy_df, user_df, exclude_tracks=exclude_tracks)
-    st.subheader("new playlist created for you")
-    st.dataframe(generated_playlist[["name", "artists", "tempo", "popularity"]])
+    generated_playlist = generate_custom_playlist(sptfy_df, user_df)
+    st.subheader("custom  ")
+    st.dataframe(generated_playlist[['name', 'artists', 'tempo', 'popularity']])
 
-    st.success("these recommendations were generated using tempo similarity + popularity filtering.")
+    st.success("recommendations generated using tempo and popularity.")
 
 if __name__ == "__main__":
     main()
