@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import streamlit as st  
 
 def load_sptfy(filepath, playlist_with=10):
     df = pd.read_csv(filepath)
@@ -31,7 +32,7 @@ def load_sptfy(filepath, playlist_with=10):
 
     return df
 
-#def match_usersongs(sptfy_df, uplay_datafr):
+def match_usersongs(sptfy_df, uplay_datafr):
     # rename columns in user dataframe if needed
     rename_map = {}
     if 'track_name' in uplay_datafr.columns and 'name' not in uplay_datafr.columns:
@@ -41,20 +42,25 @@ def load_sptfy(filepath, playlist_with=10):
     if rename_map:
         uplay_datafr = uplay_datafr.rename(columns=rename_map)
 
-    #  columns existence before merge
+    # columns existence before merge
     merge_cols = ['name', 'artists']
     missing_in_user = [col for col in merge_cols if col not in uplay_datafr.columns]
     missing_in_sptfy = [col for col in merge_cols if col not in sptfy_df.columns]
 
     if missing_in_user or missing_in_sptfy:
-        raise KeyError(f"missing columns for merge. user DF missing: {missing_in_user}, spotify DF missing: {missing_in_sptfy}")
+        st.error(f"Missing columns for merge:\n - User DF missing: {missing_in_user}\n - Spotify DF missing: {missing_in_sptfy}")
+        #  empty DataFrame with same columns as sptfy_df to avoid breaking 
+        return pd.DataFrame(columns=sptfy_df.columns)
 
     # try merge on both columns
     merged = pd.merge(uplay_datafr, sptfy_df, on=merge_cols, how='inner', suffixes=('_user', '_spotify'))
 
-    #  try merge on just 'name' if possible
+    # try merge on just 'name' if possible
     if merged.empty and 'name' in uplay_datafr.columns and 'name' in sptfy_df.columns:
         merged = pd.merge(uplay_datafr, sptfy_df, on=['name'], how='inner', suffixes=('_user', '_spotify'))
+
+    if merged.empty:
+        st.warning("No matching songs found between user data and Spotify data.")
 
     # return only columns from spotify dataframe  
     cols = sptfy_df.columns.tolist()
