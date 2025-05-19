@@ -58,8 +58,15 @@ s t r e a m l i t & d o c k e r
 ```
 ── currently public, available to see & work with on : https://spotifyrecs.streamlit.app/
 ── works with docker ( +++ )
-──  
-──   
+     git clone https://github.com/96ndaniela/sptfy.git
+     cd sptfy
+     docker build -t spotifyrecs .
+     docker run -p 8501:8501 spotifyrecs
+── visit : http://localhost:8501 in your browser to access the app.
+
+
+
+
 ```
 
  
