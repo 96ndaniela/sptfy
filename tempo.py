@@ -53,15 +53,18 @@ def enrich_user_playlist(user_df, spotify_df):
             return enriched_df.drop_duplicates(subset='id')
     return merged.dropna(subset=['tempo'])
 
-def closest_playlist(sptfy_df, user_df):
-    user_avg_tempo = user_df['tempo'].mean()
-    grouped = sptfy_df.groupby('playlist_name')
-
+def closest_playlist(spotify_df, user_df):
+    user_avg_tempo = user_df["tempo"].mean()
+    valid_playlists = spotify_df.dropna(subset=["playlist_name"])
+    grouped = valid_playlists.groupby("playlist_name")
+    playlist_names = list(grouped.groups.keys())
     closest_name = min(
-        grouped,
-        key=lambda x: abs(grouped.get_group(x)['tempo'].mean() - user_avg_tempo)
+        playlist_names,
+        key=lambda x: abs(grouped.get_group(x)["tempo"].mean() - user_avg_tempo)
     )
-    return sptfy_df[sptfy_df['playlist_name'] == closest_name]
+
+    return grouped.get_group(closest_name)
+
 
 def generate_custom_playlist(sptfy_df, user_df, playlist_size=10):
     user_avg_tempo = user_df['tempo'].mean()
