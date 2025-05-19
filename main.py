@@ -69,7 +69,7 @@ def main():
     plot_popularity_bar(matched_user_df, "most popular songs")
 
     st.subheader("recommendation from existing playlist")
-    st.dataframe(existing_playlist[["name", "artists", "playlist_name", "tempo", "popularity"]])
+    st.dataframe(existing_playlist[0][["name", "artists", "playlist_name", "tempo", "popularity"]])
 
     st.subheader("new playlist created for you")
     st.dataframe(generated_playlist[["name", "artists", "tempo", "popularity"]])
