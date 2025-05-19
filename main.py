@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
- 
+
+from tempo import load_sptfy, match_usersongs, closest_playlist, generate_custom_playlist
 
 st.set_page_config(page_title="spotify recommendations", layout="wide")
 
@@ -43,7 +44,7 @@ def main():
         uploaded_file = st.sidebar.file_uploader("upload your playlist in csv format", type=["csv"])
         if uploaded_file is not None:
             user_df = pd.read_csv(uploaded_file)
-            user_name = "new user uploaded"
+            user_name = "new uploaded user"
         else:
             st.info("please upload a new csv file to continue.")
             st.stop()
@@ -59,22 +60,19 @@ def main():
         st.warning("no matching songs found in the spotify dataset.")
         st.stop()
 
+    existing_playlist, generated_playlist = closest_playlist(sptfy_df, matched_user_df), generate_custom_playlist(sptfy_df, matched_user_df)
+
     st.subheader("tempo distribution of your playlist")
     plot_tempo_distribution(matched_user_df, "your playlist tempo distribution")
 
     st.subheader("top songs by popularity")
     plot_popularity_bar(matched_user_df, "most popular songs")
 
-    #closest
-    closest_df, closest_name = closest_playlist(sptfy_df, matched_user_df)
-    st.subheader(f"recommendation from existing playlist: {closest_name}")
-    st.dataframe(closest_df[["name", "artists", "playlist_name", "tempo", "popularity"]])
+    st.subheader("recommendation from existing playlist")
+    st.dataframe(existing_playlist[["name", "artists", "playlist_name", "tempo", "popularity"]])
 
-    #new custom playlist
-    exclude = matched_user_df['name'].tolist()
-    custom_playlist = generate_custom_playlist(sptfy_df, matched_user_df, exclude_tracks=exclude)
     st.subheader("new playlist created for you")
-    st.dataframe(custom_playlist[["name", "artists", "tempo", "popularity"]])
+    st.dataframe(generated_playlist[["name", "artists", "tempo", "popularity"]])
 
     st.success("these recommendations were generated using tempo similarity + popularity filtering.")
 
