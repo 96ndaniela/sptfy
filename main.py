@@ -55,11 +55,7 @@ def main():
 
     st.subheader(f"Original playlist for {user_name}")
     st.dataframe(user_df.head(10))
-
-    matched_user_df = match_usersongs(sptfy_df, user_df)
-    if matched_user_df.empty:
-        st.warning("no matching songs found in the spotify dataset.")
-        st.stop()
+ 
 
     # closest existing playlist and new generated playlist
     existing_playlist_df, _ = closest_playlist(sptfy_df, matched_user_df)
