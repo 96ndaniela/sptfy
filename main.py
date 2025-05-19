@@ -1,16 +1,12 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-from tempo import (
-    load_sptfy,
-    enrich_user_playlist,
-    closest_playlist,
-    generate_custom_playlist,
-)
+from tempo import load_sptfy, enrich_user_playlist, closest_playlist, generate_custom_playlist
 
-st.set_page_config(page_title="Spotify Recommendations", layout="wide")
+
+st.set_page_config(page_title="test", layout="wide")
 
 @st.cache_data
 def load_data():
@@ -27,8 +23,8 @@ def plot_tempo_distribution(df, title):
     fig, ax = plt.subplots(figsize=(8, 4))
     sns.histplot(df["tempo"], kde=True, ax=ax, color='skyblue')
     ax.set_title(title)
-    ax.set_xlabel("Tempo")
-    ax.set_ylabel("Frequency")
+    ax.set_xlabel("tempo")
+    ax.set_ylabel("frequency")
     st.pyplot(fig)
 
 def plot_popularity_bar(df, title):
@@ -40,25 +36,22 @@ def plot_popularity_bar(df, title):
 
 def main():
     st.title("spotify recommendations based on tempo & popularity")
-    sptfy_df, user_files = load_data()
 
-    st.sidebar.header("choose or upload a playlist")
+    sptfy_df, user_files = load_data()
+    st.sidebar.header("choose a playlist")
     user_choice = st.sidebar.selectbox("select user:", list(user_files.keys()) + ["upload new"])
 
     if user_choice == "upload new":
-        uploaded_file = st.sidebar.file_uploader("upload a new playlist (csv format)", type=["csv"])
+        uploaded_file = st.sidebar.file_uploader("new playlist in csv format", type=["csv"])
         if uploaded_file is not None:
             raw_user_df = pd.read_csv(uploaded_file)
-            user_name = "Uploaded User"
+            user_name = "new user has been uploaded"
         else:
             st.info("please upload a new csv file to continue.")
             st.stop()
     else:
         user_name = user_choice
         raw_user_df = pd.read_csv(user_files[user_choice])
-
-    st.subheader(f"{user_name}'s original playlist")
-    st.dataframe(raw_user_df.head(10))
 
     try:
         user_df = enrich_user_playlist(raw_user_df, sptfy_df)
@@ -67,25 +60,28 @@ def main():
         st.stop()
 
     if user_df.empty:
-        st.warning("no songs matched from the spotify dataset.")
+        st.warning("no matching songs found in spotify dataset for your playlist.")
         st.stop()
- 
 
-    st.subheader("your playlist's tempo:")
-    plot_tempo_distribution(user_df, "tempo distribution")
+    st.subheader(f"original playlist for {user_name}")
+    st.dataframe(user_df[["name", "artists", "tempo", "popularity"]].head(10))
 
-    st.subheader("top recommendations by popularity")
-    plot_popularity_bar(user_df, "best ranked songs")
+    st.subheader("yempo distribution of your playlist")
+    plot_tempo_distribution(user_df, "your playlist has this tempo:")
 
-    st.subheader("recommendation: closest existing playlist")
-    closest_df = closest_playlist(sptfy_df, user_df)
-    st.dataframe(closest_df[["name", "artists", "playlist_name", "tempo", "popularity"]])
+    st.subheader("top songs by popularity")
+    plot_popularity_bar(user_df, "most popular songs in your playlist")
 
-    st.subheader("new recommendation: tempo generated playlist")
-    new_playlist = generate_custom_playlist(sptfy_df, user_df, exclude_ids=user_df["Id"].tolist())
-    st.dataframe(new_playlist[["name", "artists", "tempo", "popularity"]])
+    existing_playlist = closest_playlist(sptfy_df, user_df)
+    st.subheader("recommendations from existing playlist")
+    st.dataframe(existing_playlist[["name", "artists", "playlist_name", "tempo", "popularity"]])
 
-    st.success("recommendations were generated using tempo similarity and popularity filters.")
+    exclude_tracks = user_df['name'].tolist()
+    generated_playlist = generate_custom_playlist(sptfy_df, user_df, exclude_tracks=exclude_tracks)
+    st.subheader("new playlist created for you")
+    st.dataframe(generated_playlist[["name", "artists", "tempo", "popularity"]])
+
+    st.success("these recommendations were generated using tempo similarity + popularity filtering.")
 
 if __name__ == "__main__":
     main()
