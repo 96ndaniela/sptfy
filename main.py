@@ -10,7 +10,7 @@ import seaborn as sns
 
 from tempo import load_sptfy, enrich_user_playlist, closest_playlist, generate_custom_playlist
 
-st.set_page_config(page_title="test", layout="wide")
+st.set_page_config(page_title="spotify song recommendations", layout="wide")
 
 @st.cache_data
 def load_data():
@@ -39,16 +39,16 @@ def plot_popularity_bar(df, title):
     st.pyplot(fig)
 
 def main():
-    st.title("test")
+    st.title("spotify song recommendations")
 
     sptfy_df, user_files = load_data()
-    st.sidebar.header("Choose or Upload a Playlist")
-    user_choice = st.sidebar.selectbox("Select User:", list(user_files.keys()) + ["upload new"])
+    st.sidebar.header("choose a playlist")
+    user_choice = st.sidebar.selectbox("user:", list(user_files.keys()) + ["upload new"])
 
     if user_choice == "upload new":
-        uploaded_file = st.sidebar.file_uploader("uploada csv", type=["csv"])
+        uploaded_file = st.sidebar.file_uploader("upload a new csv playlist", type=["csv"])
         if uploaded_file is None:
-            st.warning("Please upload a file.")
+            st.warning("please upload a file.")
             st.stop()
         raw_user_df = pd.read_csv(uploaded_file)
         user_name = "uploaded user"
@@ -68,18 +68,18 @@ def main():
     st.subheader(f"original playlist for {user_name}")
     st.dataframe(user_df[['name', 'artists', 'tempo', 'popularity']])
 
-    st.subheader("tempo")
-    plot_tempo_distribution(user_df, "your playlist tempo distribution")
+    st.subheader("playlist's tempo")
+    plot_tempo_distribution(user_df, "your playlist's tempo distribution")
 
-    st.subheader("top songs")
-    plot_popularity_bar(user_df, "Most Popular Songs")
+    st.subheader("top songs recommendations")
+    plot_popularity_bar(user_df, "most popular songs")
 
     existing_playlist_df = closest_playlist(sptfy_df, user_df)
-    st.subheader("closest ")
+    st.subheader("closest playlist")
     st.dataframe(existing_playlist_df[['name', 'artists', 'playlist_name', 'tempo', 'popularity']].head(10))
 
     generated_playlist = generate_custom_playlist(sptfy_df, user_df)
-    st.subheader("custom  ")
+    st.subheader("custom new playlist")
     st.dataframe(generated_playlist[['name', 'artists', 'tempo', 'popularity']])
 
     st.success("recommendations generated using tempo and popularity.")
