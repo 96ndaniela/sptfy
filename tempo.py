@@ -17,7 +17,7 @@ def load_sptfy(filepath, playlist_with=10):
     required_cols = ['name', 'artists', 'tempo', 'popularity']
     missing = [col for col in required_cols if col not in df.columns]
     if missing:
-        raise ValueError(f"missing columns in csv: {missing}")
+        raise ValueError(f"missing columns in spotify dataset: {missing}")
 
     df = df.drop_duplicates(subset=['name', 'artists'])
     df = df.dropna(subset=['tempo', 'popularity'])
@@ -31,17 +31,25 @@ def load_sptfy(filepath, playlist_with=10):
     return df
 
 def enrich_user_playlist(user_df, sptfy_df):
+    original_cols = user_df.columns.tolist()
     rename_map = {}
+
     if 'track_name' in user_df.columns:
         rename_map['track_name'] = 'name'
     if 'track_artist' in user_df.columns:
         rename_map['track_artist'] = 'artists'
     if 'track_popularity' in user_df.columns:
         rename_map['track_popularity'] = 'popularity'
-    if rename_map:
-        user_df = user_df.rename(columns=rename_map)
 
-    # merge dataset to get 'tempo' and 'popularity'
+    user_df = user_df.rename(columns=rename_map)
+
+    #  
+    if 'name' not in user_df.columns or 'artists' not in user_df.columns:
+        raise KeyError(
+            f"your playlist file must contain either columns ['name', 'artists'] or ['track_name', 'track_artist'].\n"
+            f"found columns: {original_cols}"
+        )
+
     enriched_df = pd.merge(
         user_df,
         sptfy_df[['name', 'artists', 'tempo', 'popularity']],
@@ -49,7 +57,7 @@ def enrich_user_playlist(user_df, sptfy_df):
         how='left'
     )
 
-    enriched_df = enriched_df.dropna(subset=['tempo'])  # only keep matched
+    enriched_df = enriched_df.dropna(subset=['tempo'])
     return enriched_df
 
 def match_usersongs(sptfy_df, user_df):
@@ -69,8 +77,7 @@ def match_usersongs(sptfy_df, user_df):
     if closest_playlist_name is None:
         raise ValueError("No similar playlist found.")
 
-    closest_playlist_df = sptfy_df[sptfy_df['playlist_name'] == closest_playlist_name]
-    return closest_playlist_df.reset_index(drop=True)
+    return sptfy_df[sptfy_df['playlist_name'] == closest_playlist_name].reset_index(drop=True)
 
 def generate_custom_playlist(sptfy_df, user_tracks_df, exclude_tracks=None, playlist_size=10):
     if exclude_tracks is None:
