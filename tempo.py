@@ -32,7 +32,7 @@ def enrich_user_playlist(user_df, spotify_df):
 
     merged = pd.merge(user_df, spotify_df, on='id', how='left', suffixes=('_user', ''))
 
-     missing_data = merged[merged['tempo'].isna()]
+    missing_data = merged[merged['tempo'].isna()]
     if not missing_data.empty:
         enriched_rows = []
         for _, user_row in missing_data.iterrows():
