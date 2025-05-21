@@ -33,6 +33,7 @@ def load_data():
     return sptfy_df, user_files
 
 def plot_tempo_distribution(df, title):
+# plots a histogram of song tempos with the given playlist's data and the title itself for the page
     fig, ax = plt.subplots(figsize=(8, 4))
     sns.histplot(df["tempo"], kde=True, ax=ax, color='skyblue')
     ax.set_title(title)
@@ -66,6 +67,7 @@ def main():
         user_name = user_choice
 
     try:
+    # add needed or wanted information to the uploaded playlists with metadata from spotify dataset. 
         user_df = enrich_user_playlist(raw_user_df, sptfy_df)
     except Exception as e:
         st.error(f"failed to process playlist: {e}")
@@ -73,20 +75,24 @@ def main():
 
     if user_df.empty:
         st.warning("no matching songs found in the spotify dataset.") 
-
+        
+    # displays original playlist ( no modifications have been made, therefore showing what the csv has )
     st.subheader(f"original playlist for {user_name}")
     st.dataframe(user_df[['name', 'artists', 'tempo', 'popularity']])
-
+    
+    # shows tempo distribution of user playlist
     st.subheader("playlist's tempo")
     plot_tempo_distribution(user_df, "your playlist's tempo distribution")
 
     st.subheader("top songs recommendations")
     plot_popularity_bar(user_df, "most popular songs")
 
+    # shows closest matching playlist from the dataset, taking the information from "playlist_name" based on tempo's average 
     existing_playlist_df = closest_playlist(sptfy_df, user_df)
     st.subheader("closest playlist")
     st.dataframe(existing_playlist_df[['name', 'artists', 'playlist_name', 'tempo', 'popularity']].head(10))
-
+    
+    # creates a new playlist based on tempo and popularity of the user's song choices, so it matches closely to their original's tempo and shows the most popular ones that would match
     generated_playlist = generate_custom_playlist(sptfy_df, user_df)
     st.subheader("custom new playlist")
     st.dataframe(generated_playlist[['name', 'artists', 'tempo', 'popularity']])
