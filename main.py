@@ -1,19 +1,28 @@
 import sys
-import os
+import os 
+
+# confirm the current file directory is in the path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# import custom functions from tempo.py ( functions that will be used for creating, and showing current playlists )
 from tempo import load_sptfy, enrich_user_playlist, closest_playlist, generate_custom_playlist
-
+# streamlit page layout configuration
 st.set_page_config(page_title="spotify song recommendations", layout="wide")
 
 @st.cache_data
 def load_data():
+    """
+    loads the main spotify dataset and predefined user playlists that have been giving for the challenge: user a, b, j & o, 
+    and the spotify dataset with robust information of each song listed.
+
+    returns:
+        sptfy_df ( dataframe ): main spotify dataset
+        user_files ( list ): user playlist file paths.
+    """
     sptfy_df = load_sptfy("data/spotify_songs.csv")
     user_files = {
         "User A": "data/User_A.csv",
