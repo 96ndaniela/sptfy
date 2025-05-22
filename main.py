@@ -50,8 +50,12 @@ def plot_tempo_distribution(df, title):
     st.pyplot(fig)
 
 def plot_popularity_bar(df, title):
+    # sort df by popularity in descending order and take the top 10 songs
     top_songs = df.sort_values(by="popularity", ascending=False).head(10)
+    # creates new matplotlib figure and axis for the bar plot
     fig, ax = plt.subplots(figsize=(8, 4))
+    # creates horizontal bar plot using seaborn
+    # x-axis: popularity score, y-axis: song name
     sns.barplot(x="popularity", y="name", data=top_songs, ax=ax, palette="viridis")
     ax.set_title(title)
     st.pyplot(fig)
