@@ -88,8 +88,7 @@ energy's too broad and often redundant with tempo.
 furthermore, the idea would be that you get recommendations that are as diverse as spotify can possibly give ─ thus, it's important to mention that, from all the data given in the csv ( dataframe ), tempo has the most unique counts to choose from ( at 10180 ). this would allow to have diverse songs that go across all the possible tempos that are available in the platform.
 
  
-![otH27BV](https://github.com/user-attachments/assets/d1fc4490-c16e-4cd1-acd4-9f45dc4dff7d)
-
+ ( https://i.imgur.com/otH27BV.jpeg )
 
 ```
  
