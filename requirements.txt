@@ -1,12 +1,12 @@
 # for framework
 streamlit 
 # all data manipulation
-pandas==2.2.2
+pandas 
 # plotting & visualization
 matplotlib 
 seaborn 
 # matching ( song name/artist matching )
 fuzzywuzzy 
-rapidfuzz==3.6.1
+rapidfuzz 
 # utilities if needed for clustering
 scikit-learn 
