@@ -67,37 +67,51 @@ def enrich_user_playlist(user_df, spotify_df):
 
 # closest ( already made ) playlist based on tempo
 def closest_playlist(spotify_df, user_df):
+    # the average tempo of the user's playlist
     user_avg_tempo = user_df["tempo"].mean()
+    # filter out any rows that don't have a valid playlist name ( incomplete data )
     valid_playlists = spotify_df.dropna(subset=["playlist_name"])
+    # roup the remaining data by playlist name
     grouped = valid_playlists.groupby("playlist_name")
+    # gives list of all available playlist names
     playlist_names = list(grouped.groups.keys())
+    # finds the playlist whose average tempo is closest to the user's average tempo
     closest_name = min(
         playlist_names,
         key=lambda x: abs(grouped.get_group(x)["tempo"].mean() - user_avg_tempo)
     )
-
+    # full playlist that was identified as the closest match
     return grouped.get_group(closest_name)
 
 # playlist based on tempo & ranking so there's more variety in options
 def generate_custom_playlist(sptfy_df, user_df, playlist_size=10):
+    # get the user's average tempo ( bpm )
     user_avg_tempo = user_df['tempo'].mean()
+    # to keep a musical vibe or feel, since the tempo affects the energy or rhythm, +/- of 15 bpm keeps the recs somewhat close in pace so that they're not completely too slow, different or too fast.
+    # too narrow tempos, ex. +/- 5 bpm only would give almost identical songs without variety, whereas too wige, ex. +/- 40 would allow songs to be filtered & shown but could have a totally slow/fast, or even unrelated sort of tempo / "vibe" 
     tempo_range = (user_avg_tempo - 15, user_avg_tempo + 15)
     excluded_ids = set(user_df['id'])
-
     candidates = sptfy_df[
         sptfy_df['tempo'].between(*tempo_range) &
         ~sptfy_df['id'].isin(excluded_ids)
     ]
+    # this is where popularity comes into play — from all the filtered possibilities, it will show them from most to least popular based already on the rempo 
+    # overall, it will give not just familiar songs but also better discovery of potential songs you might like given your tempo average
     return candidates.sort_values(by='popularity', ascending=False).head(playlist_size)
 
 # playlists based on other features
 def generate_playlist_by_feature(sptfy_df, user_df, feature, playlist_size=10):
+    # validation that the chosen feature exists in both datasets
     if feature not in sptfy_df.columns or feature not in user_df.columns:
         raise ValueError(f"Feature '{feature}' not found in data.")
-    
+    # calculates the average value of the selected feature from the user's playlist
     avg_feature = user_df[feature].mean()
+    # fins difference between each song's feature value and the user's average
     sptfy_df['diff'] = (sptfy_df[feature] - avg_feature).abs()
+    # sort songs by how close their feature value is to the user's average
+    # also drops any duplicate songs by id & selects the top 10 closest matches
     recommended_df = sptfy_df.sort_values('diff').drop_duplicates(subset=['id']).head(playlist_size)
     recommended_df = recommended_df.drop(columns='diff')
+    # result of only the relevant columns: id, name, artist, and the selected feature
     return recommended_df[['id', 'name', 'artists', feature]]
 
