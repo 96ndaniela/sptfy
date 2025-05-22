@@ -40,6 +40,7 @@ def enrich_user_playlist(user_df, spotify_df):
 
     # find entries missing any key audio features
     missing_data = merged[merged[FEATURE_COLUMNS].isnull().any(axis=1)]
+    return merged
 
     enriched_rows = []
     if not missing_data.empty:
