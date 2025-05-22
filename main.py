@@ -78,7 +78,7 @@ def main():
     # sptfy id + the id shown in the csv must match
         if user_df.empty: 
             st.warning("no matching songs found in the spotify dataset.") 
-        except Exception as e:
+    except Exception as e:
             st.error(f"failed to process playlist: {e}")
             st.stop()
         
