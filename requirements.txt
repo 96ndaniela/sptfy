@@ -1,12 +1,12 @@
 # for framework
-streamlit==1.35.0
+streamlit 
 # all data manipulation
 pandas==2.2.2
 # plotting & visualization
-matplotlib==3.8.4
-seaborn==0.13.2
+matplotlib 
+seaborn 
 # matching ( song name/artist matching )
-fuzzywuzzy==0.18.0
+fuzzywuzzy 
 rapidfuzz==3.6.1
 # utilities if needed for clustering
-scikit-learn==1.4.2
+scikit-learn 
