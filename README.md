@@ -36,7 +36,8 @@ unknown user for you to show the pipeline created to generate a new recommendati
 ```
 ── user input should be from 4 users (.csv) or a new file that has at least: id, song's name & artist
 ── must find existing playlist in dataset ( playlist_name ) & another that matches the average tempo for all songs
-── shows possible song recommendations based in popularity to meet context 3.a : *a good starting point is that you have popularity scores for each song. how can you use this scoring to create recommendations?*
+── shows possible song recommendations based in popularity to meet context 3.a : *a good starting point is that you have popularity scores for
+each song. how can you use this scoring to create recommendations?*
 ── should return top 10 tracks: keypoint being, not in the list, fulfilling 3.a
 ── needs to have tempo similarity for user's current preferences + popularity score of the songs ( rank new suggestions )
 ```
@@ -74,8 +75,10 @@ s t r e a m l i t & d o c k e r
 
 ### choosing tempo-popularity vs. other features
 ```
-── on tempo: the bpm determines the energy & pacing of a song. it's intuitive when choosing music for specific contexts; it's also stable and interpretable across genres. lastly, it works well without abrupt rhythmic shifts if there will be changes in artists.
-── on popularity: not only is derived from user engagement but it helps surface tracks users are more likely to enjoy and recognize, while also filtering out low-quality songs that may not align with the listener's expectations.
+── on tempo: the bpm determines the energy & pacing of a song. it's intuitive when choosing music for specific contexts;
+it's also stable and interpretable across genres. lastly, it works well without abrupt rhythmic shifts if there will be changes in artists.
+── on popularity: not only is derived from user engagement but it helps surface tracks users are more likely to enjoy and recognize, while also
+filtering out low-quality songs that may not align with the listener's expectations.
 
 other features:
 ── danceability can be subjective and genre-dependent; can overlap with tempo but not always align with user expectations.
@@ -83,9 +86,12 @@ energy's too broad and often redundant with tempo.
 ── loudness, realistically, is not very helpful for playlist flow ( moreso considering spotify itself is already normalizing this through the platform )
 ── speechiness can actually be useful for podcasts or spoken-word, but not for general music playlists.
 ── acousticness would be too narrow or misleading across genres.
-── mode / key / instrumentalness / valence / duration : they are songs' information, but technically, they're not always noticeable or meaningful when choosing a song itself based on preference.
+── mode / key / instrumentalness / valence / duration : they are songs' information, but technically, they're not always noticeable or meaningful when
+choosing a song itself based on preference.
 
-furthermore, the idea would be that you get recommendations that are as diverse as spotify can possibly give ─ thus, it's important to mention that, from all the data given in the csv ( dataframe ), tempo has the most unique counts to choose from ( at 10180 ). this would allow to have diverse songs that go across all the possible tempos that are available in the platform.
+furthermore, the idea would be that you get recommendations that are as diverse as spotify can possibly give ─ thus, it's important to mention that,
+from all the data given in the csv ( dataframe ), tempo has the most unique counts to choose from ( at 10180 ). this would allow to have diverse songs
+that go across all the possible tempos that are available in the platform.
 
  
  ( https://i.imgur.com/otH27BV.jpeg )
