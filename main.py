@@ -75,12 +75,12 @@ def main():
     try:
     # add needed or wanted information to the uploaded playlists with metadata from spotify dataset. 
         user_df = enrich_user_playlist(raw_user_df, sptfy_df)
-    except Exception as e:
-        st.error(f"failed to process playlist: {e}")
-        st.stop()
     # sptfy id + the id shown in the csv must match
-    if user_df.empty:
-        st.warning("no matching songs found in the spotify dataset.") 
+        if user_df.empty: 
+            st.warning("no matching songs found in the spotify dataset.") 
+        except Exception as e:
+            st.error(f"failed to process playlist: {e}")
+            st.stop()
         
     # displays original playlist ( no modifications have been made, therefore showing what the csv has )
     st.subheader(f"original playlist for {user_name}")
