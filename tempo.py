@@ -31,6 +31,7 @@ def load_sptfy(filepath, playlist_with=10):
     return df
 
 def enrich_user_playlist(user_df, spotify_df):
+    # first requirements : user-provided playlist has to have the required columns ( min. 3 )
     if not all(col in user_df.columns for col in ['Id', 'Song', 'Artist']):
         raise KeyError("user playlist must contain 'Id', 'Song', 'Artist' columns.")
     # normalize column names
@@ -42,26 +43,34 @@ def enrich_user_playlist(user_df, spotify_df):
     missing_data = merged[merged[FEATURE_COLUMNS].isnull().any(axis=1)]
     return merged
 
+    # list to store fuzzy-matched rows for missing data if any
     enriched_rows = []
     if not missing_data.empty:
         enriched_rows = []
+        # if there's a missing row, try to find a best fuzzy match based on song name and artist
         for _, user_row in missing_data.iterrows():
             best_match = None
             best_score = 0
             for _, spot_row in spotify_df.iterrows():
+                # fuzzy match song title and artist separately
                 score_name = fuzz.partial_ratio(user_row['name'], spot_row['name'])
                 score_artist = fuzz.partial_ratio(user_row['artists'], spot_row['artists'])
+                # combines scores to get a total similarity
                 total_score = (score_name + score_artist) / 2
+                # keep the match only if it's better than previous ones and above 
                 if total_score > best_score and total_score > 85:
                     best_match = spot_row
                     best_score = total_score
+            # add the best match (s) if a confident one is found        
             if best_match is not None:
                 enriched_rows.append(pd.DataFrame([best_match]))
-    # combine valid original matches and fuzzy matches
+        # combine valid original matches and fuzzy matches
         enriched_df = merged.dropna(subset=FEATURE_COLUMNS)
+        # add any fuzzy-matched w/ no duplicate ids
         if enriched_rows:
             fuzzy_df = pd.concat(enriched_rows, ignore_index=True)
             enriched_df = pd.concat([enriched_df, fuzzy_df], ignore_index=True)
+        # dropping duplicate songs ( wih the help of the id ) to reset the index    
         return enriched_df.drop_duplicates(subset='id').reset_index(drop=True)
 
 
