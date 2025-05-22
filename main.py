@@ -114,6 +114,7 @@ def main():
 
     # other available features
     st.sidebar.header("other features")
+    # all those aside from the ones decided to "drop" given the usefulness or not for a recommendation, exceptions being beyond tempo or popularity
     features = [
         'danceability', 'energy', 'key', 'loudness', 'mode',
         'speechiness', 'acousticness', 'liveness'
@@ -124,10 +125,12 @@ def main():
     if generate_btn:
         st.subheader(f"custom playlist based on '{selected_feature}'")
         try:
+           # playlist using the selected feature and user playlist as input
             feature_playlist = generate_playlist_by_feature(sptfy_df, user_df, feature=selected_feature)
             if 'id' in feature_playlist.columns:
                 feature_playlist = feature_playlist.drop(columns=['id'])
                 st.dataframe(feature_playlist)
+                # message to confirm recommendations were created
                 st.success(f"recommendations generated using '{selected_feature}'.")
         except Exception as e:
             st.error(f"could not generate recommendations using '{selected_feature}': {e}")
