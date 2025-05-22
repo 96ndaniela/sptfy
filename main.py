@@ -102,7 +102,7 @@ def main():
     # creates a new playlist based on tempo and popularity of the user's song choices, so it matches closely to their original's tempo and shows the most popular ones that would match
     generated_playlist = generate_custom_playlist(sptfy_df, user_df)
     st.subheader("custom new playlist")
-    st.dataframe(generated_playlist[['name', 'artists', 'tempo', 'popularity']])
+    st.dataframe(generated_playlist[['name', 'artists', 'tempo']])
 
     st.success("recommendations generated using tempo and popularity.")
 
