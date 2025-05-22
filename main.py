@@ -109,7 +109,7 @@ def main():
     # other available features
     st.sidebar.header("other features")
     features = [
-        'tempo', 'danceability', 'energy', 'key', 'loudness', 'mode',
+        'danceability', 'energy', 'key', 'loudness', 'mode',
         'speechiness', 'acousticness', 'liveness'
     ]
     selected_feature = st.sidebar.selectbox("choose a feature for recommendation:", features)
