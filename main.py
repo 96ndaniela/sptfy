@@ -71,7 +71,7 @@ def main():
     else:
         raw_user_df = pd.read_csv(user_files[user_choice])
         user_name = user_choice
-
+    user_df = None
     try:
     # add needed or wanted information to the uploaded playlists with metadata from spotify dataset. 
         user_df = enrich_user_playlist(raw_user_df, sptfy_df)
