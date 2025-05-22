@@ -9,7 +9,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # import custom functions from tempo.py ( functions that will be used for creating, and showing current playlists )
-from tempo import load_sptfy, enrich_user_playlist, closest_playlist, generate_custom_playlist
+from tempo import (
+    load_sptfy, 
+    enrich_user_playlist, 
+    closest_playlist, 
+    generate_custom_playlist,
+    generate_playlist_by_feature
+)
 # streamlit page layout configuration
 st.set_page_config(page_title="spotify song recommendations", layout="wide")
 
@@ -72,7 +78,7 @@ def main():
     except Exception as e:
         st.error(f"failed to process playlist: {e}")
         st.stop()
-
+    # sptfy id + the id shown in the csv must match
     if user_df.empty:
         st.warning("no matching songs found in the spotify dataset.") 
         
@@ -83,7 +89,8 @@ def main():
     # shows tempo distribution of user playlist
     st.subheader("playlist's tempo")
     plot_tempo_distribution(user_df, "your playlist's tempo distribution")
-
+    
+    # shows tempo distribution of user playlist
     st.subheader("top songs recommendations")
     plot_popularity_bar(user_df, "most popular songs")
 
@@ -98,6 +105,25 @@ def main():
     st.dataframe(generated_playlist[['name', 'artists', 'tempo', 'popularity']])
 
     st.success("recommendations generated using tempo and popularity.")
+
+    # other available features
+    st.sidebar.header("other features")
+    features = [
+        'tempo', 'danceability', 'energy', 'key', 'loudness', 'mode',
+        'speechiness', 'acousticness', 'liveness'
+    ]
+    selected_feature = st.sidebar.selectbox("choose a feature for recommendation:", features)
+    generate_btn = st.sidebar.button("generate feature-based playlist")
+
+    if generate_btn:
+        st.subheader(f"custom playlist based on '{selected_feature}'")
+        try:
+            feature_playlist = generate_playlist_by_feature(sptfy_df, user_df, feature=selected_feature)
+            st.dataframe(feature_playlist)
+            st.success(f"recommendations generated using '{selected_feature}'.")
+        except Exception as e:
+            st.error(f"could not generate recommendations using '{selected_feature}': {e}")
+
 
 if __name__ == "__main__":
     main()
