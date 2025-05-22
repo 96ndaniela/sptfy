@@ -41,9 +41,11 @@ def load_data():
 def plot_tempo_distribution(df, title):
 # plots a histogram of song tempos with the given playlist's data and the title itself for the page
     fig, ax = plt.subplots(figsize=(8, 4))
+    # ' tempo ' column with a density estimate to visualize the distribution of song tempos in the playlist
     sns.histplot(df["tempo"], kde=True, ax=ax, color='skyblue')
     ax.set_title(title)
     ax.set_xlabel("tempo")
+    # the axis is used as 'frequency' to indicate how many songs fall into each tempo range
     ax.set_ylabel("frequency")
     st.pyplot(fig)
 
