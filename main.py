@@ -119,6 +119,7 @@ def main():
         st.subheader(f"custom playlist based on '{selected_feature}'")
         try:
             feature_playlist = generate_playlist_by_feature(sptfy_df, user_df, feature=selected_feature)
+            columns_to_show = [col for col in feature_playlist.columns if col != 'id']
             st.dataframe(feature_playlist)
             st.success(f"recommendations generated using '{selected_feature}'.")
         except Exception as e:
