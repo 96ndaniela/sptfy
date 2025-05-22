@@ -1,9 +1,7 @@
-streamlit
-pandas
-matplotlib
-seaborn
-fuzzywuzzy
-scikit-learn
-rapidfuzz
-
-
+streamlit==1.35.0
+pandas==2.2.2
+matplotlib==3.8.4
+seaborn==0.13.2
+fuzzywuzzy==0.18.0
+scikit-learn==1.4.2
+rapidfuzz==3.6.1
