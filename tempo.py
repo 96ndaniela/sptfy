@@ -9,8 +9,10 @@ FEATURE_COLUMNS = [
 ]
 
 def load_sptfy(filepath, playlist_with=10):
+    #loads spotify dataset from the csv file provided
     df = pd.read_csv(filepath)
-
+    
+    # mapping from raw column names to standardize names used in the project so there's no issue with capitalization of letters or not
     rename_map = {
         'track_name': 'name',
         'track_artist': 'artists',
@@ -18,16 +20,23 @@ def load_sptfy(filepath, playlist_with=10):
         'track_id': 'id',
         'tempo': 'tempo',
     }
+    
+    # rename columns in the df if they exist in the file
     df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns}, inplace=True)
-
+    # list of columns needed for the recommendation logic to work
     required_cols = ['id', 'name', 'artists', 'tempo', 'popularity', 'playlist_name']
+    # check or correct for missing required columns, raise an error if any are missing
     missing = [col for col in required_cols if col not in df.columns]
     if missing:
         raise ValueError(f"missing columns in spotify csv: {missing}")
 
+    # delete duplicate tracks based on unique spotify id for the tracks
     df = df.drop_duplicates(subset=['id'])
+    # drops rows where audio features are missing ( tempo or popularity )
     df = df.dropna(subset=['tempo', 'popularity'])
+    # reset index after filtering
     df = df.reset_index(drop=True)
+    # cleaned and updated dataframe
     return df
 
 def enrich_user_playlist(user_df, spotify_df):
